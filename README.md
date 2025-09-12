@@ -51,7 +51,7 @@ A minimalist Next.js website for publishing developer manifestos with clean typo
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [https://manifesto.masterfabric.co](https://manifesto.masterfabric.co) in your browser (or http://localhost:3000 for local development)
 
 ## Database Setup
 

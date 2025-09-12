@@ -15,7 +15,9 @@ export async function GET(request: NextRequest) {
   // If there's an explicit error from GitHub
   if (error) {
     console.error('GitHub OAuth error:', error, errorDescription);
-    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${encodeURIComponent(error)}&description=${encodeURIComponent(errorDescription || '')}`);
+    const isLocalEnv = process.env.NODE_ENV === 'development';
+    const redirectDomain = isLocalEnv ? origin : 'https://manifesto.masterfabric.co';
+    return NextResponse.redirect(`${redirectDomain}/auth/auth-code-error?error=${encodeURIComponent(error)}&description=${encodeURIComponent(errorDescription || '')}`);
   }
 
   if (code) {
@@ -51,24 +53,31 @@ export async function GET(request: NextRequest) {
         const forwardedHost = request.headers.get('x-forwarded-host');
         const isLocalEnv = process.env.NODE_ENV === 'development';
         
+        // Always use production domain in production
         if (isLocalEnv) {
           return NextResponse.redirect(`${origin}${next}`);
-        } else if (forwardedHost) {
-          return NextResponse.redirect(`https://${forwardedHost}${next}`);
         } else {
-          return NextResponse.redirect(`${origin}${next}`);
+          // Force redirect to production domain
+          const productionDomain = 'https://manifesto.masterfabric.co';
+          return NextResponse.redirect(`${productionDomain}${next}`);
         }
       } else {
         console.error('Supabase auth error:', supabaseError);
-        return NextResponse.redirect(`${origin}/auth/auth-code-error?error=supabase_error&description=${encodeURIComponent(supabaseError.message)}`);
+        const isLocalEnv = process.env.NODE_ENV === 'development';
+        const redirectDomain = isLocalEnv ? origin : 'https://manifesto.masterfabric.co';
+        return NextResponse.redirect(`${redirectDomain}/auth/auth-code-error?error=supabase_error&description=${encodeURIComponent(supabaseError.message)}`);
       }
     } catch (err) {
       console.error('Auth callback exception:', err);
-      return NextResponse.redirect(`${origin}/auth/auth-code-error?error=callback_exception`);
+      const isLocalEnv = process.env.NODE_ENV === 'development';
+      const redirectDomain = isLocalEnv ? origin : 'https://manifesto.masterfabric.co';
+      return NextResponse.redirect(`${redirectDomain}/auth/auth-code-error?error=callback_exception`);
     }
   }
 
   // No code parameter found - this might be normal for hash-based auth
   console.log('No code parameter found, redirecting to home (might be hash-based auth)');
-  return NextResponse.redirect(`${origin}${next}`);
+  const isLocalEnv = process.env.NODE_ENV === 'development';
+  const redirectDomain = isLocalEnv ? origin : 'https://manifesto.masterfabric.co';
+  return NextResponse.redirect(`${redirectDomain}${next}`);
 }

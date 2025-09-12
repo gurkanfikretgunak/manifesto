@@ -41,7 +41,7 @@ const Footer = () => {
             <div className="text-sm text-gray-600">
               <span className="font-semibold">Source Code:</span> 
               <a 
-                href="https://github.com/yourusername/manifesto" 
+                href="https://github.com/gurkanfikretgunak/manifesto" 
                 className="ml-1 hover:text-gray-900 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"

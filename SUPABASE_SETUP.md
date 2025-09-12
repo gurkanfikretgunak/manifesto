@@ -112,7 +112,7 @@ CREATE TRIGGER on_auth_user_created
 2. Click "New OAuth App" button
 3. Fill in the following information:
    - **Application name**: `Developer Manifesto`
-   - **Homepage URL**: `http://localhost:3000` (for development)
+   - **Homepage URL**: `https://manifesto.masterfabric.co` (for production) or `http://localhost:3000` (for development)
    - **Authorization callback URL**: `https://your-project-id.supabase.co/auth/v1/callback`
 
 ### Enable GitHub Provider in Supabase
@@ -130,7 +130,7 @@ CREATE TRIGGER on_auth_user_created
    npm run dev
    ```
 
-2. Go to `http://localhost:3000` in your browser
+2. Go to `https://manifesto.masterfabric.co` in your browser (or `http://localhost:3000` for local development)
 
 3. You should now see real GitHub authentication instead of demo mode:
    - ✅ "Sign in with GitHub" button
