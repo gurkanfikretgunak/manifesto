@@ -1,36 +1,170 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Developer Manifesto
+
+A minimalist Next.js website for publishing developer manifestos with clean typography, interactive 3D animations, and GitHub-based signature system.
+
+## Features
+
+- **Markdown-driven content**: Manifesto content is managed through `.md` files
+- **JetBrains Mono typography**: Clean, technical font for optimal readability
+- **Interactive 3D animations**: Geometric Three.js animations with mouse interactions
+- **GitHub Authentication**: Sign the manifesto with your GitHub account
+- **Dynamic Signature System**: Real-time signature tracking with Supabase
+- **Public API**: RESTful API for signature data
+- **Responsive design**: Works seamlessly across all devices
+- **SEO optimized**: Proper meta tags and semantic HTML
+
+## Tech Stack
+
+- **Next.js 15+** (App Router)
+- **TailwindCSS** with typography plugin
+- **Three.js** with React Three Fiber for 3D animations
+- **Supabase** for authentication and database
+- **Gray Matter** for frontmatter parsing
+- **Remark** for Markdown processing
+- **TypeScript** for type safety
 
 ## Getting Started
 
-First, run the development server:
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+2. Set up Supabase:
+   - Create a new project at [supabase.com](https://supabase.com)
+   - Create the database tables (see Database Setup below)
+   - Configure GitHub OAuth provider
+   - Copy your project URL and anon key
+
+3. Create environment variables:
+   ```bash
+   cp .env.example .env.local
+   ```
+   Then update `.env.local` with your Supabase credentials:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Database Setup
+
+Run this SQL in your Supabase SQL editor:
+
+```sql
+-- Profiles table
+CREATE TABLE profiles (
+  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  github_username TEXT,
+  full_name TEXT,
+  avatar_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Signatures table
+CREATE TABLE signatures (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  message TEXT,
+  location TEXT,
+  signed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- RLS Policies
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE signatures ENABLE ROW LEVEL SECURITY;
+
+-- Profiles policies
+CREATE POLICY "Public profiles are viewable by everyone" ON profiles
+  FOR SELECT USING (true);
+
+CREATE POLICY "Users can insert their own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can update their own profile" ON profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+-- Signatures policies
+CREATE POLICY "Public signatures are viewable by everyone" ON signatures
+  FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can insert signatures" ON signatures
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own signatures" ON signatures
+  FOR UPDATE USING (auth.uid() = user_id);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## GitHub OAuth Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Go to your Supabase project dashboard
+2. Navigate to Authentication > Providers
+3. Enable GitHub provider
+4. Create a GitHub OAuth App:
+   - Go to GitHub Settings > Developer settings > OAuth Apps
+   - Create new OAuth App
+   - Set Authorization callback URL to: `https://your-project.supabase.co/auth/v1/callback`
+5. Copy Client ID and Client Secret to Supabase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Content Management
 
-## Learn More
+The manifesto content is located in `/manifesto/manifesto.md`. Edit this file to update the manifesto:
 
-To learn more about Next.js, take a look at the following resources:
+```markdown
+---
+title: "Developer Manifesto"
+date: "2025-01-12"
+author: "Developer Community"
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Your Manifesto Content
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Write your manifesto here using standard Markdown syntax.
+```
 
-## Deploy on Vercel
+## Customization
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Font
+The site uses JetBrains Mono loaded from Google Fonts. To change the font, update the link in `src/app/layout.tsx` and the font family in `tailwind.config.js`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Colors
+Main colors are defined in `tailwind.config.js`:
+- `manifesto-gray`: #222222 (main text color)
+
+### Animation
+The Three.js animation can be customized in `src/components/AbstractAnimation.tsx`.
+
+## Deployment
+
+The site is optimized for static export:
+
+```bash
+npm run build
+npm run export
+```
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── layout.tsx          # Root layout with font loading
+│   ├── page.tsx            # Main manifesto page
+│   └── globals.css         # Global styles
+├── components/
+│   └── AbstractAnimation.tsx # Three.js animation component
+manifesto/
+└── manifesto.md            # Manifesto content
+```
+
+## License
+
+This project is open source and available under the MIT License.
