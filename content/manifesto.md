@@ -4,8 +4,6 @@ date: "01-09-2025"
 author: "MasterFabric Developers"
 ---
 
-# Developer Manifesto
-
 ## Principles to Build By
 
 In the realm of code and creation, we stand united by these fundamental truths that guide our journey through the <u>developer lifecycle</u>—from eager beginner to seasoned architect.
