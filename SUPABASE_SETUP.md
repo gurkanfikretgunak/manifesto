@@ -22,7 +22,7 @@ This guide explains the necessary steps to run the Developer Manifesto project w
 
 ## ⚙️ Step 3: Set Environment Variables
 
-Edit the `.env.local` file:
+Edit the `.env` file:
 
 ```bash
 # Paste your actual Supabase values here
@@ -165,7 +165,7 @@ This setup includes a complete GDPR-compliant privacy consent system:
 ## 🔧 Troubleshooting
 
 ### "Demo Mode" Still Showing
-- Make sure `.env.local` file has correct values
+- Make sure `.env` file has correct values
 - Restart development server
 - Clear browser cache
 

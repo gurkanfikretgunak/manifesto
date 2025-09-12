@@ -67,12 +67,11 @@ const Footer = () => {
             </div>
             <div className="text-sm text-gray-600">
               <a 
-                href="https://gurkanfikretgunak.com" 
+                href="https://www.gurkanfikretgunak.com" 
                 className="font-semibold hover:text-gray-900 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                gurkanfikretgunak.com
               </a>
             </div>
           </div>

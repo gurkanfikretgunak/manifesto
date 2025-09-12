@@ -38,9 +38,9 @@ A minimalist Next.js website for publishing developer manifestos with clean typo
 
 3. Create environment variables:
    ```bash
-   cp .env.example .env.local
+   cp .env.example .env
    ```
-   Then update `.env.local` with your Supabase credentials:
+   Then update `.env` with your Supabase credentials:
    ```
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
