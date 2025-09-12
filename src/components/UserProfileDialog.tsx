@@ -82,11 +82,11 @@ export const UserProfileDialog = ({ user, isOpen, onClose, onSignManifesto }: Us
         {/* Content */}
         <div className="p-6">
           {/* User Info Card */}
-          <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200 mb-6">
+          <div className="flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
             <img
               src={user.user_metadata?.avatar_url || 'https://avatars.githubusercontent.com/u/0?v=4'}
               alt={user.user_metadata?.full_name || 'User'}
-              className="w-16 h-16 rounded-full border-2 border-white shadow-sm"
+              className="w-16 h-16 rounded-full border-2 border-gray-100 shadow-sm"
             />
             <div className="flex-1">
               <h3 className="font-semibold text-manifesto-gray text-lg">

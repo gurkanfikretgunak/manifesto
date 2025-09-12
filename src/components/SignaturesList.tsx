@@ -45,7 +45,7 @@ const SignatureCard = ({ signature }: { signature: Signature }) => {
   };
 
   return (
-    <div className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow bg-white">
+    <div className="p-4 border border-gray-200 rounded-lg hover:shadow-lg transition-all duration-200 bg-white shadow-sm">
       <div className="flex items-center space-x-3 mb-3">
         <img
           src={signature.profiles.avatar_url}
@@ -63,12 +63,12 @@ const SignatureCard = ({ signature }: { signature: Signature }) => {
       </div>
       
       {signature.message && (
-        <p className="text-sm text-gray-700 mb-3 italic">
+        <p className="text-sm text-gray-700 mb-3 italic bg-gray-50 p-3 rounded-md border-l-4 border-blue-200">
           "{signature.message}"
         </p>
       )}
       
-      <div className="flex justify-between items-center text-xs text-gray-500">
+      <div className="flex justify-between items-center text-xs text-gray-500 pt-2 border-t border-gray-100">
         {signature.location && (
           <span className="flex items-center space-x-1">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">

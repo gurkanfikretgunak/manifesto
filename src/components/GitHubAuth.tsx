@@ -27,6 +27,7 @@ export const GitHubAuth = ({ onAuthChange, onShowUserDialog }: GitHubAuthProps) 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [mockMode, setMockMode] = useState(false);
+  const [userPrivacyConsent, setUserPrivacyConsent] = useState<boolean | null>(null);
   const { hasUserSigned } = useSignatures();
 
   // Mock user for development
@@ -64,11 +65,16 @@ export const GitHubAuth = ({ onAuthChange, onShowUserDialog }: GitHubAuthProps) 
         if (currentUser) {
           console.log('Initial session found, checking if user has signed...');
           
-          // Check if user has already signed the manifesto
+          // Check if user has already signed the manifesto and privacy consent
           const checkAndShowDialog = async () => {
             try {
               const hasSigned = await hasUserSigned(currentUser.id);
+              const privacyConsent = await checkUserPrivacyConsent(currentUser.id);
+              
               console.log('User has signed:', hasSigned);
+              console.log('User privacy consent:', privacyConsent);
+              
+              setUserPrivacyConsent(privacyConsent);
               
               if (!hasSigned && !localStorage.getItem('user_dialog_shown')) {
                 console.log('User has not signed, showing user dialog');
@@ -100,10 +106,18 @@ export const GitHubAuth = ({ onAuthChange, onShowUserDialog }: GitHubAuthProps) 
       // Listen for auth changes
       const {
         data: { subscription },
-      } = supabase.auth.onAuthStateChange((event, session) => {
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
         const currentUser = session?.user ? session.user as unknown as User : null;
         setUser(currentUser);
         onAuthChange?.(currentUser);
+        
+        // Check privacy consent when user signs in
+        if (currentUser) {
+          const privacyConsent = await checkUserPrivacyConsent(currentUser.id);
+          setUserPrivacyConsent(privacyConsent);
+        } else {
+          setUserPrivacyConsent(null);
+        }
         
         // Show user dialog when user signs in
         if (event === 'SIGNED_IN' && currentUser) {
@@ -135,6 +149,33 @@ export const GitHubAuth = ({ onAuthChange, onShowUserDialog }: GitHubAuthProps) 
     onShowUserDialog?.(mockUser);
   };
 
+  // Check user's privacy consent status from database
+  const checkUserPrivacyConsent = async (userId: string): Promise<boolean | null> => {
+    try {
+      const isConnected = await testSupabaseConnection();
+      
+      if (!isConnected) {
+        return null;
+      }
+
+      const { data, error } = await supabase
+        .from('signatures')
+        .select('privacy_consent')
+        .eq('user_id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking user privacy consent:', error);
+        return null;
+      }
+      
+      return data?.privacy_consent || null;
+    } catch (error) {
+      console.error('Error checking privacy consent:', error);
+      return null;
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-4">
@@ -145,26 +186,42 @@ export const GitHubAuth = ({ onAuthChange, onShowUserDialog }: GitHubAuthProps) 
 
   if (user) {
     return (
-      <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <img
-          src={user.user_metadata?.avatar_url || 'https://avatars.githubusercontent.com/u/0?v=4'}
-          alt={user.user_metadata?.full_name || 'User'}
-          className="w-10 h-10 rounded-full border-2 border-white shadow-sm"
-        />
-        <div className="flex-1">
-          <h4 className="font-semibold text-manifesto-gray text-sm">
-            {user.user_metadata?.full_name || user.user_metadata?.name || 'User'}
-          </h4>
-          <p className="text-xs text-gray-500">
-            @{user.user_metadata?.preferred_username || user.user_metadata?.user_name || 'username'}
-          </p>
+      <div className="space-y-3">
+        <div className="flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <img
+            src={user.user_metadata?.avatar_url || 'https://avatars.githubusercontent.com/u/0?v=4'}
+            alt={user.user_metadata?.full_name || 'User'}
+            className="w-10 h-10 rounded-full border-2 border-gray-100 shadow-sm"
+          />
+          <div className="flex-1">
+            <h4 className="font-semibold text-manifesto-gray text-sm">
+              {user.user_metadata?.full_name || user.user_metadata?.name || 'User'}
+            </h4>
+            <p className="text-xs text-gray-500">
+              @{user.user_metadata?.preferred_username || user.user_metadata?.user_name || 'username'}
+            </p>
+          </div>
+          <button
+            onClick={signOut}
+            className="text-xs text-gray-600 hover:text-gray-800 px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1 transition-all duration-200 font-medium"
+          >
+            Sign Out
+          </button>
         </div>
-        <button
-          onClick={signOut}
-          className="text-xs text-gray-600 hover:text-gray-800 px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1 transition-all duration-200 font-medium"
-        >
-          Sign Out
-        </button>
+        
+        {/* Privacy Consent Status */}
+        {userPrivacyConsent === true && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+            <div className="flex items-center space-x-2">
+              <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <p className="text-xs text-green-800 font-medium">
+                GDPR Compliant - You've approved public display of your profile information.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
