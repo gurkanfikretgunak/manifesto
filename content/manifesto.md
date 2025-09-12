@@ -1,6 +1,6 @@
 ---
 title: "Developer Manifesto"
-date: "2025-01-12"
+date: "01-09-2025"
 author: "MasterFabric Developers"
 ---
 

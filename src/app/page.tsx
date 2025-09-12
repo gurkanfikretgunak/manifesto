@@ -72,6 +72,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                gurkanfikretgunak.com
               </a>
             </div>
           </div>
@@ -82,6 +83,10 @@ const Footer = () => {
             <p>Built with Next.js, TailwindCSS, and Three.js</p>
             <p>Database: Supabase | Typography: JetBrains Mono</p>
             <p>Content managed via Markdown</p>
+            <div className="mt-4 pt-3 border-t border-gray-50">
+              <p>© 2025 MasterFabric Developers. All rights reserved.</p>
+              <p>Version v1.0.0+beta</p>
+            </div>
           </div>
         </div>
       </div>
