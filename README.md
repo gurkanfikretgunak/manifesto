@@ -116,7 +116,7 @@ CREATE POLICY "Users can update their own signatures" ON signatures
 
 ## Content Management
 
-The manifesto content is located in `/manifesto/manifesto.md`. Edit this file to update the manifesto:
+The manifesto content is located in `content/manifesto.md`. Edit this file to update the manifesto:
 
 ```markdown
 ---
@@ -156,13 +156,33 @@ npm run export
 ```
 src/
 ├── app/
+│   ├── api/
+│   │   ├── manifesto/      # Manifesto content API
+│   │   └── signatures/     # Signatures API
+│   ├── auth/
+│   │   ├── callback/       # OAuth callback handler
+│   │   └── auth-code-error/ # Auth error page
 │   ├── layout.tsx          # Root layout with font loading
 │   ├── page.tsx            # Main manifesto page
 │   └── globals.css         # Global styles
 ├── components/
-│   └── AbstractAnimation.tsx # Three.js animation component
-manifesto/
+│   ├── AbstractAnimation.tsx # Three.js animation component
+│   ├── GitHubAuth.tsx      # GitHub authentication component
+│   ├── SignatureForm.tsx   # Signature form component
+│   ├── SignaturesList.tsx  # Signatures display component
+│   ├── UserProfileDialog.tsx # User profile modal
+│   ├── AuthHashHandler.tsx # Auth hash handling
+│   ├── PrivacyConsentDialog.tsx # Privacy consent modal
+│   ├── PrivacyWarningBanner.tsx # Privacy warning banner
+│   └── SignatureSuccessDialog.tsx # Success confirmation modal
+├── hooks/
+│   └── useSignatures.ts    # Custom hook for signatures
+└── lib/
+    └── supabase.ts         # Supabase client configuration
+content/
 └── manifesto.md            # Manifesto content
+migrations/
+└── add_privacy_consent.sql # Database migration for privacy consent
 ```
 
 ## License
